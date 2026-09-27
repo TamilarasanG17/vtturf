@@ -31,40 +31,73 @@ function verifyResetToken(token) {
 /* ------------------------------------------------------------------ */
 
 exports.register = catchAsync(async (req, res, next) => {
-  const { username, email, password, confirmPassword } = req.body;
+  try {
+    const { username, email, password, confirmPassword } = req.body;
 
-  if (!username || !email || !password || !confirmPassword) {
-    return next(new AppError("All fields are required.", 400));
-  }
-  if (!isValidEmail(email)) {
-    return next(new AppError("Please provide a valid email address.", 400));
-  }
-  if (!isStrongPassword(password)) {
-    return next(new AppError(PASSWORD_RULES_MESSAGE, 400));
-  }
-  if (password !== confirmPassword) {
-    return next(new AppError("Passwords do not match.", 400));
-  }
+    console.log("REGISTER REQUEST:", {
+      username,
+      email,
+    });
 
-  const normalizedEmail = email.toLowerCase().trim();
-  const existingUser = await User.findOne({ email: normalizedEmail });
-  if (existingUser && existingUser.isVerified) {
-    return next(new AppError("An account with this email already exists.", 409));
+    if (!username || !email || !password || !confirmPassword) {
+      return next(new AppError("All fields are required.", 400));
+    }
+
+    if (!isValidEmail(email)) {
+      return next(new AppError("Please provide a valid email address.", 400));
+    }
+
+    if (!isStrongPassword(password)) {
+      return next(new AppError(PASSWORD_RULES_MESSAGE, 400));
+    }
+
+    if (password !== confirmPassword) {
+      return next(new AppError("Passwords do not match.", 400));
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    console.log("Checking existing user...");
+
+    const existingUser = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    if (existingUser && existingUser.isVerified) {
+      return next(
+        new AppError(
+          "An account with this email already exists.",
+          409
+        )
+      );
+    }
+
+    console.log("Hashing password...");
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    console.log("Sending OTP...");
+
+    await createAndSendOTP({
+      email: normalizedEmail,
+      type: "REGISTER",
+      username,
+      payload: {
+        username,
+        passwordHash,
+      },
+    });
+
+    console.log("OTP sent successfully.");
+
+    res.status(200).json({
+      success: true,
+      message: `OTP sent to ${normalizedEmail}. Please verify to complete registration.`,
+    });
+  } catch (error) {
+    console.error("REGISTER ERROR:", error);
+    throw error;
   }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  await createAndSendOTP({
-    email: normalizedEmail,
-    type: "REGISTER",
-    username,
-    payload: { username, passwordHash },
-  });
-
-  res.status(200).json({
-    success: true,
-    message: `OTP sent to ${normalizedEmail}. Please verify to complete registration.`,
-  });
 });
 
 exports.verifyRegisterOTP = catchAsync(async (req, res, next) => {
