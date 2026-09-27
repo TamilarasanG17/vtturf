@@ -69,25 +69,43 @@ exports.register = catchAsync(async (req, res, next) => {
 
 exports.verifyRegisterOTP = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
-  if (!email || !otp) return next(new AppError("Email and OTP are required.", 400));
 
-  const normalizedEmail = email.toLowerCase().trim();
-  const payload = await verifyOTP({ email: normalizedEmail, type: "REGISTER", otp });
-
-  const user = await User.findOne({ email: normalizedEmail });
-  if (user && user.isVerified) {
-    return next(new AppError("An account with this email already exists.", 409));
+  if (!email || !otp) {
+    return next(new AppError("Email and OTP are required.", 400));
   }
 
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const payload = await verifyOTP({
+    email: normalizedEmail,
+    type: "REGISTER",
+    otp,
+  });
+
+  const user = await User.findOne({ email: normalizedEmail });
+
+  if (user && user.isVerified) {
+    return next(
+      new AppError("An account with this email already exists.", 409)
+    );
+  }
+
+  let createdUser;
+
   if (user) {
-    // A previous registration attempt existed but was never verified; finish it.
-    // Update directly (bypassing the pre-save hash hook since passwordHash is already hashed).
+    // Previous registration attempt existed but was not verified
     await User.updateOne(
       { _id: user._id },
-      { username: payload.username, password: payload.passwordHash, isVerified: true }
+      {
+        username: payload.username,
+        password: payload.passwordHash,
+        isVerified: true,
+      }
     );
+
+    createdUser = await User.findById(user._id);
   } else {
-    await User.create({
+    createdUser = await User.create({
       username: payload.username,
       email: normalizedEmail,
       password: payload.passwordHash,
@@ -95,9 +113,14 @@ exports.verifyRegisterOTP = catchAsync(async (req, res, next) => {
     });
   }
 
+  // Generate JWT after successful OTP verification
+  const token = generateToken(createdUser);
+
   res.status(201).json({
     success: true,
-    message: "Registration successful. You can now log in.",
+    message: "Registration successful.",
+    token,
+    user: createdUser.toSafeObject(),
   });
 });
 
