@@ -79,7 +79,7 @@ export default function BookingDetails() {
           <div className="bg-blue-500 py-3 text-center font-semibold text-white">Booking Completed</div>
         )}
 
-        <img src={booking.turfImage} alt={booking.turfName} className="h-48 w-full object-cover" />
+        <img src={`https://vtturf.onrender.com${booking.turfImage}`} alt={booking.turfName} className="h-48 w-full object-cover" />
 
         <div className="space-y-4 p-4 sm:p-6">
           <div className="text-center">
