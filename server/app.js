@@ -16,7 +16,7 @@ const bookingRoutes = require("./routes/bookingRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
-
+app.set("trust proxy", 1);
 const allowedOrigins = [
   "http://localhost:5173",
   "https://vt-turf.vercel.app"
