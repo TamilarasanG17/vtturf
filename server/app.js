@@ -17,10 +17,14 @@ const reviewRoutes = require("./routes/reviewRoutes");
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://vt-turf.vercel.app"
+];
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173" || https://vt-turf.vercel.app/,
+    origin: allowedOrigins,
     credentials: true,
   })
 );
