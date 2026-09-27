@@ -14,7 +14,7 @@ export default function TurfCard({ turf, index = 0 }) {
       <Link to={`/turfs/${turf._id}`}>
         <div className="relative h-44 w-full overflow-hidden">
           <motion.img
-            src={turf.images?.[0]}
+            src={`https://vtturf.onrender.com${turf.images?.[0]}`}
             alt={turf.name}
             className="h-full w-full object-cover"
             whileHover={{ scale: 1.08 }}
