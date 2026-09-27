@@ -107,7 +107,7 @@ export default function Booking() {
         {/* Turf image - left on desktop, top on mobile */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
           <div className="overflow-hidden rounded-2xl">
-            <img src={turf.images[0]} alt={turf.name} className="h-56 w-full object-cover sm:h-72" />
+            <img src={`https://vtturf.onrender.com${turf.images?.[0]}`} alt={turf.name} className="h-56 w-full object-cover sm:h-72" />
           </div>
           <h2 className="mt-4 text-xl font-bold text-ink-900">{turf.name}</h2>
           <p className="text-sm text-slate-500">📍 {turf.location}</p>
