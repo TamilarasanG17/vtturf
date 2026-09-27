@@ -42,7 +42,7 @@ export default function BookingCard({ booking, index = 0, onCancelled }) {
       transition={{ duration: 0.35, delay: Math.min(index * 0.05, 0.3) }}
       className="card flex flex-col gap-4 p-4 sm:flex-row"
     >
-      <img src={booking.turfImage} alt={booking.turfName} className="h-32 w-full flex-shrink-0 rounded-xl object-cover sm:w-40" />
+      <img src={`https://vtturf.onrender.com${booking.turfImage}`} alt={booking.turfName} className="h-32 w-full flex-shrink-0 rounded-xl object-cover sm:w-40" />
       <div className="flex flex-1 flex-col justify-between gap-2">
         <div>
           <div className="flex flex-wrap items-start justify-between gap-2">
