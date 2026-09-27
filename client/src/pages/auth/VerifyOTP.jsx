@@ -52,9 +52,15 @@ export default function VerifyOTP() {
       const { data } = await VERIFY_FN[type]({ email, otp });
 
       if (type === "REGISTER") {
-        await alertSuccess("Registration successful!", "You can now log in.");
-        navigate("/login");
-      } else if (type === "LOGIN") {
+          login(data.token, data.user);
+        
+          await alertSuccess(
+            "Registration successful!",
+            `Welcome, ${data.user.username}.`
+          );
+        
+          navigate("/");
+        }else if (type === "LOGIN") {
         login(data.token, data.user);
         await alertSuccess("Login successful!", `Welcome back, ${data.user.username}.`);
         navigate("/");
