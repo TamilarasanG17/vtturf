@@ -7,11 +7,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "https://vtturf.vercel.app/",
+        target: "https://vtturf.onrender.com/",
         changeOrigin: true,
       },
       "/uploads": {
-        target: "https://vtturf.vercel.app/",
+        target: "https://vtturf.onrender.com/",
         changeOrigin: true,
       },
     },
